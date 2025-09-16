@@ -1,6 +1,6 @@
 # Hoovertron: A Device for the Quantitative Measurement of Hoover's Sign
 
-This repository contains the complete design files and software for the Hoovertron, a portable, floor-based device developed for the standardized, quantitative measurement of Hoover's sign. The project aims to provide a reliable and objective tool to aid in the diagnosis of functional leg weakness, a common feature of Functional Neurological Disorder (FND).
+This repository contains the complete design files and software for the Hoovertron, a portable, floor-based device developed for the standardised, quantitative measurement of Hoover's sign. The project aims to provide a reliable and objective tool to aid in the diagnosis of functional leg weakness, a common feature of Functional Neurological Disorder (FND).
 
 This work is based on the research paper: *Quantitative Measurement of Hoover's sign: development of a standardised sensor, interface procedure and testing in healthy individuals*.
 
