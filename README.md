@@ -30,8 +30,8 @@ The device housing is custom-designed to isolate the heel and ensure that downwa
 ### Electronics
 The electronic components are mounted on a custom PCB. The core components include:
 *   **Microcontroller:** An Arduino Nano Every is used for data acquisition and communication.
-*   **Force Sensor:** An Ohmite FSR01CE Force Sensing Resistor measures the downward pressure exerted by the heel.
-*   **Signal Conditioning:** An MCP6002 Op-Amp is used as a voltage follower to buffer the signal from the sensor before it is read by the Arduino's analog-to-digital converter.
+*   **Force Sensor:** An Ohmite FSR01CE Force Sensing Resistor measures the downward pressure exerted by the heel. The PCB is designed to accommodate two sensors (PS1 and PS2), but the current implementation uses only one.
+*   **Signal Conditioning:** The signal from the active sensor is conditioned using an MCP6002 Op-Amp. The sensor is configured in a voltage divider circuit with a 180 Ω resistor. Three 100 nF capacitors are used to improve signal stability: one across the resistor for filtering and two for power supply decoupling. The op-amp is connected as a voltage follower to buffer the signal before it is read by the Arduino's analog-to-digital converter, preventing measurement inaccuracies due to loading effects.
 *   **Power:** The entire device is powered via the USB connection to the PC.
 
 ## Software
