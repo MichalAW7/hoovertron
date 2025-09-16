@@ -14,7 +14,7 @@ The Hoovertron provides a reliable method to quantify and record the voluntary a
 
 This project is organized into the following directories:
 
-*   **/3D Parts - SolidEdge**: Contains the SolidEdge CAD files for the 3D-printed components of the device, including the main housing, footrest, and removable foot extender.
+*   **/3D Parts - SolidEdge**: Contains the SolidEdge CAD files for the 3D-printed components of the device, including the main housing and footrest.
 *   **/PCB - Altium**: Contains the Altium Designer files for the custom Printed Circuit Board (PCB) that houses the sensor interface electronics.
 *   **/Arduino - C++**: Contains the firmware source code for the Arduino Nano Every microcontroller. This code is responsible for reading data from the force sensor, processing it, and transmitting it to the PC.
 *   **/GUI - Python**: Contains the source code for the desktop Graphical User Interface (GUI) developed in Python with PyQt5. This application receives, visualizes, and analyzes the force data.
