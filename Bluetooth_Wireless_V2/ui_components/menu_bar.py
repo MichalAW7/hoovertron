@@ -10,27 +10,30 @@ class MenuBar:
         
         main_ui.menuFile = QtWidgets.QMenu(main_ui.menubar)
         main_ui.menuFile.setObjectName("menuFile")
+        
         main_ui.menuEdit = QtWidgets.QMenu(main_ui.menubar)
         main_ui.menuEdit.setObjectName("menuEdit")
-        main_ui.menuBaud = QtWidgets.QMenu(main_ui.menuEdit)
-        main_ui.menuBaud.setObjectName("menuBaud")
+        
+        # Filter Frequency remains in Edit
         main_ui.menuFilterFrequency = QtWidgets.QMenu(main_ui.menuEdit)
         main_ui.menuFilterFrequency.setObjectName("menuFilterFrequency")
         
         main_ui.menuDatabase = QtWidgets.QMenu(main_ui.menubar)
         main_ui.menuDatabase.setObjectName("menuDatabase")
         
-        # NEW: Connection menu
+        # Connection menu
         main_ui.menuConnection = QtWidgets.QMenu(main_ui.menubar)
         main_ui.menuConnection.setObjectName("menuConnection")
         
         main_ui.menuHelp = QtWidgets.QMenu(main_ui.menubar)
         main_ui.menuHelp.setObjectName("menuHelp")
+        
         MainWindow.setMenuBar(main_ui.menubar)
         main_ui.statusbar = QtWidgets.QStatusBar(MainWindow)
         main_ui.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(main_ui.statusbar)
 
+        # --- Actions ---
         main_ui.actionNew = QtWidgets.QAction(MainWindow)
         main_ui.actionNew.setShortcut("Ctrl+N")
         main_ui.actionNew.setObjectName("actionNew")
@@ -62,21 +65,38 @@ class MenuBar:
         main_ui.actionUpdateDatabase.setObjectName("actionUpdateDatabase")
         main_ui.actionUpdateDatabase.triggered.connect(main_ui.file_update_database)
 
-        # Legacy COM port - keeping for backwards compatibility
-        main_ui.actionPort = AddComport(main_ui, main_ui.menuEdit)
-        main_ui.actionPort.porttnavn.connect(main_ui.valgAfComport)
-
-        # NEW: BLE Device Manager - Add to Connection menu
+        # --- Connection Menu Items ---
+        
+        # 1. Bluetooth (AddBleDevice adds "Bluetooth" submenu)
         main_ui.ble_manager = AddBleDevice(main_ui, main_ui.menuConnection)
         main_ui.ble_manager.device_selected.connect(main_ui.on_ble_device_selected)
         main_ui.ble_manager.connect_requested.connect(main_ui.connect_ble_persistent)
         main_ui.ble_manager.disconnect_requested.connect(main_ui.disconnect_ble_persistent)
+        
+        # 2. USB Connection Submenu
+        main_ui.menuUSB = main_ui.menuConnection.addMenu("USB Connection")
+        main_ui.menuUSB.setObjectName("menuUSB")
+        
+        # Baud Menu (now under USB)
+        main_ui.menuBaud = QtWidgets.QMenu(main_ui.menuUSB)
+        main_ui.menuBaud.setObjectName("menuBaud")
+        
+        # COM Port (AddComport adds "COM Port" submenu)
+        # We pass menuUSB as the parent menu
+        main_ui.actionPort = AddComport(main_ui, main_ui.menuUSB)
+        main_ui.actionPort.porttnavn.connect(main_ui.valgAfComport)
 
+        # Baud Actions
         main_ui.action19200 = QtWidgets.QAction(MainWindow)
         main_ui.action19200.setObjectName("action19200")
         main_ui.action42069 = QtWidgets.QAction(MainWindow)
         main_ui.action42069.setObjectName("action42069")
+        
+        main_ui.menuBaud.addAction(main_ui.action19200)
+        
+        main_ui.menuUSB.addMenu(main_ui.menuBaud)
 
+        # --- Filter Frequency Actions ---
         main_ui.actionHeavy5Hz = QtWidgets.QAction(MainWindow)
         main_ui.actionHeavy5Hz.setObjectName("actionHeavy5Hz")
         main_ui.actionHeavy5Hz.setCheckable(True)
@@ -95,6 +115,15 @@ class MenuBar:
         main_ui.frequencyActionGroup.addAction(main_ui.actionStandard10Hz)
         main_ui.frequencyActionGroup.addAction(main_ui.actionResponsive20Hz)
 
+        main_ui.menuFilterFrequency.addAction(main_ui.actionHeavy5Hz)
+        main_ui.menuFilterFrequency.addAction(main_ui.actionStandard10Hz)
+        main_ui.menuFilterFrequency.addAction(main_ui.actionResponsive20Hz)
+        
+        main_ui.actionHeavy5Hz.triggered.connect(lambda: main_ui.set_filter_frequency(5))
+        main_ui.actionStandard10Hz.triggered.connect(lambda: main_ui.set_filter_frequency(10))
+        main_ui.actionResponsive20Hz.triggered.connect(lambda: main_ui.set_filter_frequency(20))
+
+        # --- Help Actions ---
         main_ui.actionGetting_Started = QtWidgets.QAction(MainWindow)
         main_ui.actionGetting_Started.setObjectName("actionGetting_Started")
         main_ui.actionTroubleshooting = QtWidgets.QAction(MainWindow)
@@ -102,6 +131,11 @@ class MenuBar:
         main_ui.actionFAQs = QtWidgets.QAction(MainWindow)
         main_ui.actionFAQs.setObjectName("actionFAQs")
         
+        main_ui.menuHelp.addAction(main_ui.actionGetting_Started)
+        main_ui.menuHelp.addAction(main_ui.actionTroubleshooting)
+        main_ui.menuHelp.addAction(main_ui.actionFAQs)
+        
+        # --- Assemble Menu Bar ---
         main_ui.menuFile.addAction(main_ui.actionNew)
         main_ui.menuFile.addAction(main_ui.actionOpen)
         main_ui.menuFile.addAction(main_ui.actionSave)
@@ -111,27 +145,14 @@ class MenuBar:
         main_ui.menuDatabase.addAction(main_ui.actionOpenDatabase)
         main_ui.menuDatabase.addAction(main_ui.actionUpdateDatabase)
         
-        main_ui.menuBaud.addAction(main_ui.action19200)
-        main_ui.menuEdit.addAction(main_ui.menuBaud.menuAction())
-
-        main_ui.menuFilterFrequency.addAction(main_ui.actionHeavy5Hz)
-        main_ui.menuFilterFrequency.addAction(main_ui.actionStandard10Hz)
-        main_ui.menuFilterFrequency.addAction(main_ui.actionResponsive20Hz)
+        # Edit Menu (Only Filter Frequency now)
         main_ui.menuEdit.addAction(main_ui.menuFilterFrequency.menuAction())
 
-        main_ui.actionHeavy5Hz.triggered.connect(lambda: main_ui.set_filter_frequency(5))
-        main_ui.actionStandard10Hz.triggered.connect(lambda: main_ui.set_filter_frequency(10))
-        main_ui.actionResponsive20Hz.triggered.connect(lambda: main_ui.set_filter_frequency(20))
-
-        main_ui.menuHelp.addAction(main_ui.actionGetting_Started)
-        main_ui.menuHelp.addAction(main_ui.actionTroubleshooting)
-        main_ui.menuHelp.addAction(main_ui.actionFAQs)
-        
-        # Add menus to menubar in correct order: File, Edit, Database, Connection, Help
+        # Add menus to menubar
         main_ui.menubar.addAction(main_ui.menuFile.menuAction())
         main_ui.menubar.addAction(main_ui.menuEdit.menuAction())
         main_ui.menubar.addAction(main_ui.menuDatabase.menuAction())
-        main_ui.menubar.addAction(main_ui.menuConnection.menuAction())  # NEW: between Database and Help
+        main_ui.menubar.addAction(main_ui.menuConnection.menuAction())
         main_ui.menubar.addAction(main_ui.menuHelp.menuAction())
 
     def retranslate_ui(self, main_ui):
@@ -140,7 +161,8 @@ class MenuBar:
         main_ui.menuEdit.setTitle(_translate("MainWindow", "Edit"))
         main_ui.menuBaud.setTitle(_translate("MainWindow", "Baud"))
         main_ui.menuDatabase.setTitle(_translate("MainWindow", "Database"))
-        main_ui.menuConnection.setTitle(_translate("MainWindow", "Connection"))  # NEW
+        main_ui.menuConnection.setTitle(_translate("MainWindow", "Connection"))
+        main_ui.menuUSB.setTitle(_translate("MainWindow", "USB Connection"))
         main_ui.menuHelp.setTitle(_translate("MainWindow", "Help"))
         
         main_ui.actionCreateDatabase.setText(_translate("MainWindow", "Create Database"))
