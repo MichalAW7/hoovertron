@@ -4,16 +4,17 @@ Welcome to the HooverTron User Manual. This guide provides detailed instructions
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [Connecting the Device](#connecting-the-device)
-3. [Entering Patient Information](#entering-patient-information)
-4. [Conducting the Hoover's Sign Test](#conducting-the-hoovers-sign-test)
+2. [Hardware Power & Setup](#hardware-power--setup)
+3. [Connecting the Device](#connecting-the-device)
+4. [Entering Patient Information](#entering-patient-information)
+5. [Conducting the Hoover's Sign Test](#conducting-the-hoovers-sign-test)
     - [Step 1: Unaffected Leg Extension](#step-1-unaffected-leg-extension)
     - [Step 2: Affected Leg Voluntary Extension](#step-2-affected-leg-voluntary-extension)
     - [Step 3: Affected Leg Involuntary Extension](#step-3-affected-leg-involuntary-extension)
     - [Refining Data: Selecting a Time Period](#refining-data-selecting-a-time-period)
-5. [Viewing Results and Analysis](#viewing-results-and-analysis)
-6. [Managing Data (Files and Database)](#managing-data-files-and-database)
-7. [Settings and Filtering](#settings-and-filtering)
+6. [Viewing Results and Analysis](#viewing-results-and-analysis)
+7. [Managing Data (Files and Database)](#managing-data-files-and-database)
+8. [Settings and Filtering](#settings-and-filtering)
 
 ---
 
@@ -21,9 +22,18 @@ Welcome to the HooverTron User Manual. This guide provides detailed instructions
 
 HooverTron is a specialized desktop application designed to capture, visualize, and calculate objective force measurements during the Hoover's Sign Test. By communicating with external sensors, HooverTron plots real-time extension force and automatically calculates the Involuntary/Voluntary Ratio (IVVR) to provide a high-confidence objective measurement.
 
+## Hardware Power & Setup
+
+Before connecting the device to your computer, ensure the physical hardware is powered on and functioning.
+
+1. **Power On**: Press the small **white button** on the device. 
+    * *Verification*: You should see the green light on the Arduino Nano BLE 33 begin to flash. Additionally, the battery pack's level indicator lights will glow blue.
+2. **Power Off**: When finished with the HooverTron, double-press the small **white button**.
+    * *Verification*: Both the flashing green Arduino light and the blue battery pack lights will turn off.
+
 ## Connecting the Device
 
-Before conducting any tests, you must connect the HooverTron software to your sensor hardware.
+Once the HooverTron hardware is powered on, connect the software:
 
 1. **Bluetooth (BLE) Connection**:
    - Go to the top menu bar and select **Connection > Bluetooth**.
@@ -34,7 +44,7 @@ Before conducting any tests, you must connect the HooverTron software to your se
    - You can also adjust the baud rate under **Connection > USB Connection > Baud** (default is typically 19200).
 
 > [!TIP]
-> Ensure the device is turned on and properly connected to the patient before proceeding with the tests.
+> Ensure the device is securely connected to the patient's leg via the straps before proceeding with the tests.
 
 ## Entering Patient Information
 
@@ -83,7 +93,7 @@ In any of the steps (1, 2, or 3), you might capture more data than needed (e.g.,
 4. The peak (and average) measurements will automatically update to reflect *only* the data within your selected time period.
 
 > [!WARNING]
-> Use the **Clear Data** button carefully; it will permanently wide the data graph and measurements for that specific step.
+> Use the **Clear Data** button carefully; it will permanently wipe the data graph and measurements for that specific step.
 
 ## Viewing Results and Analysis
 
