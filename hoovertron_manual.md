@@ -43,9 +43,6 @@ Once the HooverTron hardware is powered on, connect the software:
    - Go to **Connection > USB Connection > COM Port** and select the appropriate port for your device.
    - You can also adjust the baud rate under **Connection > USB Connection > Baud** (default is typically 19200).
 
-> [!TIP]
-> Ensure the device is securely connected to the patient's leg via the straps before proceeding with the tests.
-
 ## Entering Patient Information
 
 Once the device is connected, begin by entering the patient's information in the first tab.
