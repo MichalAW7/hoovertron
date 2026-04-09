@@ -1,0 +1,246 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+
+% Define tasteful colors
+\definecolor{primary}{RGB}{43, 87, 154} % Elegant deep blue
+\definecolor{secondary}{RGB}{95, 106, 106} % Sophisticated gray
+\definecolor{accent}{RGB}{231, 76, 60} % Subtle red for warnings/cautions
+
+% Hyperref setup for clickable links
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    filecolor=magenta,      
+    urlcolor=primary,
+    pdftitle={HooverTron User Manual},
+    pdfauthor={HooverTron Team}
+}
+
+% Section formatting for a modern, clean look
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{primary}}{\thesection}{1em}{}[{\titlerule[0.8pt]}]
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{secondary}}{\thesubsection}{1em}{}
+
+% Header and Footer styling
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\fancyhead[L]{\textcolor{secondary}{HooverTron User Manual}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Custom Tip/Warning boxes
+\newtcolorbox{tipbox}{colback=primary!5!white,colframe=primary,title=Tip,fonttitle=\bfseries}
+\newtcolorbox{warningbox}{colback=accent!5!white,colframe=accent,title=Warning,fonttitle=\bfseries}
+
+% Title section
+\title{\vspace{-2cm}\Huge \textbf{\textcolor{primary}{HooverTron}} \\[0.5cm] \LARGE User Manual}
+\author{}
+\date{\vspace{-1cm}}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+\noindent Welcome to the HooverTron User Manual. This guide provides detailed instructions on how to set up, operate, and analyze data using the HooverTron application, an advanced clinical tool for conducting the Hoover's Sign Test with integrated sensor hardware.
+\end{abstract}
+
+\vspace{1cm}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+HooverTron is a specialized desktop application designed to capture, visualize, and calculate objective force measurements during the Hoover's Sign Test. By communicating with external sensors, HooverTron plots real-time extension force and automatically calculates the Involuntary/Voluntary Ratio (IVVR) to provide a high-confidence objective measurement.
+
+\section{Hardware Power \& Setup}
+Before connecting the device to your computer, ensure the physical hardware is powered on and functioning.
+
+\begin{figure}[h]
+    \centering
+    % TODO: Place your screenshot/photo in an 'images' folder
+    \includegraphics[width=0.6\textwidth, draft]{images/hardware_setup.png}
+    \caption{Hardware Power setup and LED indicators}
+    \label{fig:hardware-setup}
+\end{figure}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Power On}: Press the small \textbf{white button} on the device. 
+    \begin{itemize}
+        \item \textit{Verification}: You should see the green light on the Arduino Nano BLE 33 begin to flash. Additionally, the battery pack's level indicator lights will glow blue.
+    \end{itemize}
+    \item \textbf{Power Off}: When finished with the HooverTron, double-press the small \textbf{white button}.
+    \begin{itemize}
+        \item \textit{Verification}: Both the flashing green Arduino light and the blue battery pack lights will turn off.
+    \end{itemize}
+\end{enumerate}
+
+\section{Connecting the Device}
+Once the HooverTron hardware is powered on, connect the software as shown in Figure \ref{fig:connection-menu}:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth, draft]{images/connection_menu.png}
+    \caption{Connecting the device via Bluetooth or USB}
+    \label{fig:connection-menu}
+\end{figure}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Bluetooth (BLE) Connection}:
+    \begin{itemize}
+        \item Go to the top menu bar and select \textbf{Connection > Bluetooth}.
+        \item Select your device from the list of available BLE devices and click connect.
+    \end{itemize}
+    \item \textbf{USB (Serial) Connection}:
+    \begin{itemize}
+        \item Alternatively, connect via USB.
+        \item Go to \textbf{Connection > USB Connection > COM Port} and select the appropriate port for your device.
+        \item You can also adjust the baud rate under \textbf{Connection > USB Connection > Baud} (default is typically 19200).
+    \end{itemize}
+\end{enumerate}
+
+\begin{tipbox}
+Ensure the device is securely connected to the patient's leg via the straps before proceeding with the tests.
+\end{tipbox}
+
+\section{Entering Patient Information}
+Once the device is connected, begin by entering the patient's information.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth, draft]{images/patient_info.png}
+    \caption{Entering patient information in the software}
+    \label{fig:patient-info}
+\end{figure}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item Navigate to the \textbf{Patient Information} tab.
+    \item Fill out all relevant fields:
+    \begin{itemize}
+        \item \textbf{Name} \& \textbf{Preferred Name}
+        \item \textbf{Date of Birth} \& \textbf{Date of Visit} (The patient's age will be calculated automatically).
+        \item \textbf{Sex}, \textbf{Reason for Visit}, and \textbf{Notes}.
+        \item \textbf{Examiner Name}.
+        \item Select the \textbf{Dominant Leg} and the \textbf{Selected Leg} (the leg primarily being evaluated) from the dropdown menus.
+    \end{itemize}
+\end{enumerate}
+
+\section{Conducting the Hoover's Sign Test}
+Navigate to the \textbf{Hoover's Sign Test} main tab. This tab contains three sub-tabs for the different steps of the test, plus a dedicated Results tab.
+
+\subsection{Step 1: Unaffected Leg Extension}
+This step establishes a baseline using the patient's strong/unaffected leg.
+\begin{enumerate}
+    \item Instruct the patient according to the infographic on the left.
+    \item Click the green \textbf{Record} button to begin capturing force data. The button text will change to \textbf{Stop}.
+    \item The graph will populate with real-time force measurements (in Newtons) over time.
+    \item Click \textbf{Stop} when the capture is complete. 
+    \item The application automatically detects the peak Extension force and displays it in the Measurements box on the right.
+    \item Enter any specific observations in the Notes box.
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth, draft]{images/step1_recording.png}
+    \caption{Recording Unaffected Leg Extension with real-time force chart}
+    \label{fig:step1}
+\end{figure}
+
+\subsection{Step 2: Affected Leg Voluntary Extension}
+This step evaluates the voluntary strength of the patient's weak/affected leg.
+\begin{enumerate}
+    \item Navigate to the \textbf{Step 2} tab.
+    \item Instruct the patient to perform voluntary extension on their affected leg.
+    \item Click \textbf{Record} to begin capturing, and click \textbf{Stop} when done.
+    \item Both the \textbf{Force Average} (dashed line) and \textbf{Force Peak} of the chosen time range will be automatically captured and displayed.
+\end{enumerate}
+
+\subsection{Step 3: Affected Leg Involuntary Extension}
+This step evaluates the reflex/involuntary extension of the patient's weak leg while they flex their strong leg.
+\begin{enumerate}
+    \item Navigate to the \textbf{Step 3} tab.
+    \item Instruct the patient as per the clinical guidelines for Hoover's Sign.
+    \item Click \textbf{Record} and perform the procedure, then click \textbf{Stop}.
+    \item The system will record the \textbf{Force Peak} of the involuntary extension.
+\end{enumerate}
+
+\subsection{Refining Data: Selecting a Time Period}
+In any of the steps (1, 2, or 3), you might capture more data than needed (e.g., noise before or after the actual extension effort). You can isolate the valid data as shown in Figure \ref{fig:refining-data}:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth, draft]{images/time_selection.png}
+    \caption{Refining the data by selecting a specific time period on the chart}
+    \label{fig:refining-data}
+\end{figure}
+
+\begin{enumerate}
+    \item On the graph, you will see a shaded vertical region.
+    \item Drag the edges of this shaded region over the peaks representing the true effort.
+    \item Alternatively, specify exact timestamps in the \textbf{Start Time} and \textbf{End Time} boxes below the graph and click the red \textbf{Select Time Period} button.
+    \item The peak (and average) measurements will automatically update to reflect \textit{only} the data within your selected time period.
+\end{enumerate}
+
+\begin{warningbox}
+Use the \textbf{Clear Data} button carefully; it will permanently wipe the data graph and measurements for that specific step.
+\end{warningbox}
+
+\section{Viewing Results and Analysis}
+Once all three steps are complete, navigate to the \textbf{Results} tab.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth, draft]{images/results_analysis.png}
+    \caption{Final Results and IVVR Calculation}
+    \label{fig:results}
+\end{figure}
+
+\begin{enumerate}
+    \item Review the Raw Data section to ensure that the un-affected leg extension, affected leg voluntary extension (V), and affected leg involuntary extension (IV) are populated correctly.
+    \item Click the large blue \textbf{Calculate Results} button.
+    \item The software will automatically calculate the \textbf{Involuntary/Voluntary Ratio (IVVR)} using the formula: \texttt{IVVR = IV / V}.
+    \item An analysis summary will populate at the bottom right, and you can record final overarching comments in the \textbf{Observations} box.
+\end{enumerate}
+
+\section{Managing Data (Files and Database)}
+HooverTron allows you to save individual patient files as well as aggregate data into a single, comprehensive database.
+
+\subsection{Saving an Individual Patient File}
+\begin{itemize}
+    \item \textbf{File > New}: Create and save a new individual \texttt{.csv} file for the current session.
+    \item \textbf{File > Save}: Overwrite the currently opened \texttt{.csv} file with the latest changes.
+    \item \textbf{File > Open}: Open a previously saved patient \texttt{.csv} file. It will auto-populate the graphs, patient info, and results.
+\end{itemize}
+
+\subsection{Managing the Master Database}
+The Database function aggregates summary rows (one row per test) for bulk export and analysis.
+\begin{itemize}
+    \item \textbf{Database > Create Database}: Start a new master \texttt{.csv} file. This establishes the headers and inserts the current test as Test \#1.
+    \item \textbf{Database > Open Database}: Link the application to an existing master database file so new records can be appended.
+    \item \textbf{Database > Update Database}: Appends the \textit{current} test data (Patient Info, Peak Forces, and IVVR) as a new row at the bottom of the active database file.
+\end{itemize}
+
+\section{Settings and Filtering}
+To ensure clean and readable charts, especially in environments susceptible to noise or tremors, HooverTron features adjustable signal filtering.
+
+\begin{itemize}
+    \item Go to \textbf{Edit > Filter Frequency} to select the smoothing level.
+    \item \textbf{Heavy (5 Hz)}: Recommended for noisy environments or patients with tremors. Visually smooths the line heavily.
+    \item \textbf{Standard (10 Hz)}: The default setting, providing a balance of responsiveness and smoothness.
+    \item \textbf{Responsive (20 Hz)}: Best for analyzing rapid, minute movements without losing high-frequency data spikes.
+\end{itemize}
+
+\end{document}
