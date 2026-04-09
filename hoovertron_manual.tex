@@ -89,7 +89,17 @@ Before connecting the device to your computer, ensure the physical hardware is p
 \end{enumerate}
 
 \section{Connecting the Device}
-Once the HooverTron hardware is powered on, connect the software as shown in Figure \ref{fig:connection-menu}:
+
+\subsection{Auto-Connect (Recommended)}
+The HooverTron software features a convenient, automatic BLE (Bluetooth) connection capability. For the smoothest setup:
+\begin{enumerate}
+    \item Ensure the HooverTron hardware is powered on \textit{before} you launch the application.
+    \item Upon startup, the application will automatically perform a 5-second background scan for the device.
+    \item If the HooverTron is detected, the software will select it (marked with a $\star$) and connect automatically. You will see an "Auto-connecting..." message in the bottom status bar once successful.
+\end{enumerate}
+
+\subsection{Manual Connection Options}
+If the device was not powered on before the application launched, or if you need to use a wired connection, follow these manual steps as shown in Figure \ref{fig:connection-menu}:
 
 \begin{figure}[h]
     \centering
@@ -99,16 +109,16 @@ Once the HooverTron hardware is powered on, connect the software as shown in Fig
 \end{figure}
 
 \begin{enumerate}[label=\textbf{\arabic*.}]
-    \item \textbf{Bluetooth (BLE) Connection}:
+    \item \textbf{Manual Bluetooth (BLE) Connection}:
     \begin{itemize}
-        \item Go to the top menu bar and select \textbf{Connection > Bluetooth}.
-        \item Select your device from the list of available BLE devices and click connect.
+        \item Go to the top menu bar and select \textbf{Connection > Bluetooth > Scan for Devices}.
+        \item Once the 5-second scan finishes, select the HooverTron device from the populated list and click \textbf{Connect}.
     \end{itemize}
     \item \textbf{USB (Serial) Connection}:
     \begin{itemize}
-        \item Alternatively, connect via USB.
+        \item Alternatively, connect via a physical USB cable.
         \item Go to \textbf{Connection > USB Connection > COM Port} and select the appropriate port for your device.
-        \item You can also adjust the baud rate under \textbf{Connection > USB Connection > Baud} (default is typically 19200).
+        \item You can adjust the baud rate under \textbf{Connection > USB Connection > Baud} (default is typically 19200).
     \end{itemize}
 \end{enumerate}
 
