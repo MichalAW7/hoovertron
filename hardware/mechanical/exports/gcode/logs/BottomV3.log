@@ -1,0 +1,37 @@
+Solid Edge Translation To 3MF
+Date: Friday,March 06,2026 04:39PM
+Output File: C:\Users\wierc\Documents\hoovertron\Github\3D Parts - SolidEdge\Revised Main Part\BottomV3.3mf
+Author: Unknown
+Organization: Unknown
+Source System: SOLID EDGE
+
+Hardware:
+Processor: AMD Ryzen 7 7800X3D 8-Core Processor           
+Operating System: Windows 10 Professional
+Installed Memory: 31.1 GB
+
+Software Information:
+Parasolid Version: 37.0.118
+PSBodyshop Version: 37.0.94
+3MF Adapter Version: 15.0.142
+Solid Edge Version: 225.00.01.004 x64
+
+3MF Export Options
+Export Construction Solids:Off
+Export Displayed Parts:Off
+Enable Logging:On
+AllowInvalid3mfObjects:Off
+Export Flatten Assembly:On
+Export Units:Millimeters
+Export Tolerance Value:1.250000
+Export Tolerance Type:Custom
+Export Surface Plane Angle Value:0.523599
+Export Author:Unknown
+Export Description:Unknown
+Export Organization:Unknown
+Export Program Name:Unknown
+
+Translation progress:
+Phase 1 of 1 Translating Parasolid to foreign data types...
+Translation process completed
+Time required to translate:00 : 00 : 00

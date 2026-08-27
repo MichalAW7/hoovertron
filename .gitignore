@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.egg-info/
+.env
+
+# PyInstaller
+build/
+dist/
+*.spec.bak
+
+# Altium outputs (keep src, ignore regen on future builds)
+# Note: currently committed for archive (keep all versions), future regenerations ignored
+hardware/pcb/outputs/
+*.Cam
+*.gbr
+*.apr
+*.rep
+*.EXTREP
+*.GTL
+*.GBL
+*.GTO
+*.GBO
+*.GTS
+*.GBS
+*.GKO
+*.GM*
+*.G1
+
+# 3D print generated
+*.log
+hardware/mechanical/exports/gcode/logs/
+
+# Sensitive / data
+patient data.csv
+*patient*.csv
+*.csv
+!requirements.txt
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+
+# IDE
+.idea/
+.vscode/
