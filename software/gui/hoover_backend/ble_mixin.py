@@ -32,7 +32,9 @@ class BleMixin:
             if self.ble_client.is_connected:
                 print(f"Connected to {self.ble_device.name}")
                 self.is_connected = True
+                self.connection_type = "BLE"
                 self.ble_manager.update_connection_state(True)
+                self.update_connection_indicator(True, "BLE", self.ble_device.name)
                 self.statusbar.showMessage(f"Connected to {self.ble_device.name}", 5000)
                 
                 # Start notifications
@@ -41,11 +43,15 @@ class BleMixin:
             else:
                 QMessageBox.critical(self, "Error", "Failed to connect to HooverTron")
                 self.ble_manager.update_connection_state(False)
+                self.update_connection_indicator(False)
                 
         except Exception as e:
             print(f"BLE connection error: {e}")
             QMessageBox.critical(self, "Error", f"Failed to connect to BLE device: {str(e)}")
             self.ble_manager.update_connection_state(False)
+            self.is_connected = False
+            self.connection_type = None
+            self.update_connection_indicator(False)
 
     async def disconnect_ble(self):
         """Disconnect from the BLE device"""
@@ -56,8 +62,10 @@ class BleMixin:
                 await self.ble_client.disconnect()
                 print("Disconnected from BLE device")
                 self.is_connected = False
+                self.connection_type = None
                 self.is_recording = False # Ensure recording stops
                 self.ble_manager.update_connection_state(False)
+                self.update_connection_indicator(False)
                 self.statusbar.showMessage("Disconnected", 3000)
                 
                 # Reset buttons if they were recording
@@ -119,9 +127,9 @@ class BleMixin:
             self.is_recording = False
 
             self.extensionForceLineEdit.setText(str(max(self.hsS1RForce)))
-            self.strongLegAverageStrengthLineEdit_2.setText(str(max(self.hsS2RAverage)))
-            self.strongLegPeakStrengthLineEdit_2.setText(str(max(self.hsS2RForce)))
-            self.weakLegPeakStrengthLineEdit_3.setText(str(max(self.hsS3RForce)))
+            self.unaffectedLegAverageStrengthLineEdit_2.setText(str(max(self.hsS2RAverage)))
+            self.unaffectedLegPeakStrengthLineEdit_2.setText(str(max(self.hsS2RForce)))
+            self.affectedLegPeakStrengthLineEdit_3.setText(str(max(self.hsS3RForce)))
 
     def valgAfComport(self, nyport):
         """Legacy COM port selection - now used for BLE device selection"""

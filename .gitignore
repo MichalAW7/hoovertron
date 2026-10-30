@@ -37,6 +37,7 @@ hardware/mechanical/exports/gcode/logs/
 
 # Sensitive / data
 patient data.csv
+HooverTron Patients/
 *patient*.csv
 *.csv
 !requirements.txt
