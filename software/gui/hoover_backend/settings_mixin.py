@@ -13,7 +13,9 @@ from config import get_drafts_dir, get_settings_file_path
 
 
 class SettingsMixin:
-    SNAPSHOT_VERSION = 1
+    SNAPSHOT_VERSION = 2
+    # Snapshots older than this hold the patient's name, date of birth, age and sex
+    PATIENT_ID_SNAPSHOT_VERSION = 2
     AUTOSAVE_DELAY_MS = 2000
     SNAPSHOT_JSON_LABEL = "HooverTron Snapshot JSON:"
 
@@ -307,7 +309,7 @@ class SettingsMixin:
                 "id": self.current_draft_id,
                 "created_at": self.current_draft_created_at,
                 "updated_at": self._utcnow_iso(),
-                "patient_name": self.nameLineEdit.text().strip(),
+                "patient_id": self.patientIdLineEdit.text().strip(),
                 "export_path": self.patientDataFile or "",
                 "completion_status": self._get_completion_status(),
                 "is_active": True,
@@ -318,15 +320,11 @@ class SettingsMixin:
                 "test_tab_index": self.tabWidget_2.currentIndex(),
             },
             "patient": {
-                "name": self.nameLineEdit.text(),
-                "preferred_name": self.preferredNameLineEdit.text(),
-                "date_of_birth": self.dateOfBirthDateEdit.date().toString(QtCore.Qt.ISODate),
+                "patient_id": self.patientIdLineEdit.text().strip(),
+                "examiner": self.examinerLineEdit.text(),
                 "date_of_visit": self.dateOfVisitDateEdit.date().toString(QtCore.Qt.ISODate),
-                "age": self.ageLineEdit.text(),
-                "sex": self.sexComboBox.currentText(),
                 "reason_for_visit": self.reasonForVisitLineEdit.text(),
                 "notes": self.notesLineEdit.text(),
-                "examiner": self.examinerLineEdit.text(),
                 "dominant_leg": self.dominantLegComboBox.currentText(),
                 "selected_leg": self.selectedLegComboBox.currentText(),
             },
@@ -342,13 +340,11 @@ class SettingsMixin:
         }
 
     def is_autosave_eligible(self, snapshot):
-        patient_name = snapshot.get("patient", {}).get("name", "").strip()
-        if not patient_name:
+        patient = snapshot.get("patient", {})
+        if not patient.get("patient_id", "").strip():
             return False
 
-        patient = snapshot.get("patient", {})
         meaningful_patient_fields = (
-            patient.get("preferred_name"),
             patient.get("reason_for_visit"),
             patient.get("notes"),
             patient.get("examiner"),
@@ -356,8 +352,6 @@ class SettingsMixin:
         if any(value for value in meaningful_patient_fields):
             return True
 
-        if patient.get("sex", "----") != "----":
-            return True
         if patient.get("dominant_leg", "----") != "----":
             return True
         if patient.get("selected_leg", "----") != "----":
@@ -373,29 +367,42 @@ class SettingsMixin:
         results = snapshot.get("results", {})
         return bool(results.get("observations", "").strip())
 
+    def _is_legacy_snapshot(self, snapshot):
+        return snapshot.get("version", 1) < self.PATIENT_ID_SNAPSHOT_VERSION
+
+    def _warn_legacy_patient_details(self):
+        QMessageBox.information(
+            self,
+            "Older Patient File",
+            "This file was saved by an older version of HooverTron. Its personal details "
+            "(name, date of birth, age and sex) were not loaded.\n\n"
+            "Enter a patient ID on the Patient Info tab so this session can be saved. "
+            "Saving writes a new file named by the patient ID.",
+        )
+        self.set_workflow_tab_by_id("patient")
+
     def apply_snapshot(self, snapshot):
         self._is_applying_snapshot = True
         if self.autosave_timer.isActive():
             self.autosave_timer.stop()
 
+        is_legacy_snapshot = self._is_legacy_snapshot(snapshot)
         try:
             patient = snapshot.get("patient", {})
             results = snapshot.get("results", {})
             ui_state = snapshot.get("ui", {})
             steps = snapshot.get("steps", {})
 
-            self.patientDataFile = snapshot.get("draft", {}).get("export_path", "") or ""
+            # An older file's name holds the patient's name and date of birth, so save to a new one
+            export_path = snapshot.get("draft", {}).get("export_path", "") or ""
+            self.patientDataFile = "" if is_legacy_snapshot else export_path
 
             today = QtCore.QDate.currentDate()
-            self.nameLineEdit.setText(patient.get("name", ""))
-            self.preferredNameLineEdit.setText(patient.get("preferred_name", ""))
-            self.dateOfBirthDateEdit.setDate(self._restore_date(patient.get("date_of_birth", ""), today))
+            self.patientIdLineEdit.setText(patient.get("patient_id", ""))
+            self.examinerLineEdit.setText(patient.get("examiner", ""))
             self.dateOfVisitDateEdit.setDate(self._restore_date(patient.get("date_of_visit", ""), today))
-            self.ageLineEdit.setText(patient.get("age", ""))
-            self._set_combo_text(self.sexComboBox, patient.get("sex", "----"))
             self.reasonForVisitLineEdit.setText(patient.get("reason_for_visit", ""))
             self.notesLineEdit.setText(patient.get("notes", ""))
-            self.examinerLineEdit.setText(patient.get("examiner", ""))
             self._set_combo_text(self.dominantLegComboBox, patient.get("dominant_leg", "----"))
             self._set_combo_text(self.selectedLegComboBox, patient.get("selected_leg", "----"))
 
@@ -450,6 +457,9 @@ class SettingsMixin:
         finally:
             self._is_applying_snapshot = False
 
+        if is_legacy_snapshot:
+            self._warn_legacy_patient_details()
+
     def reset_patient_state(self):
         self._is_applying_snapshot = True
         if self.autosave_timer.isActive():
@@ -458,15 +468,11 @@ class SettingsMixin:
         try:
             today = QtCore.QDate.currentDate()
             self.patientDataFile = ""
-            self.nameLineEdit.clear()
-            self.preferredNameLineEdit.clear()
-            self.dateOfBirthDateEdit.setDate(today)
+            self.patientIdLineEdit.clear()
             self.dateOfVisitDateEdit.setDate(today)
-            self.ageLineEdit.clear()
-            self.sexComboBox.setCurrentIndex(0)
             self.reasonForVisitLineEdit.clear()
             self.notesLineEdit.clear()
-            self.examinerLineEdit.clear()
+            # The examiner is kept: the same clinician usually tests the next patient
             self.dominantLegComboBox.setCurrentIndex(0)
             self.selectedLegComboBox.setCurrentIndex(0)
 

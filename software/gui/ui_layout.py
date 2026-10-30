@@ -14,7 +14,7 @@ from ui_components import theme
 
 WORKFLOW_TABS = [
     # (attr_name, tab_id, label, subtitle, step_index)
-    ("tab_3", "patient",          "Patient Info",  "Demographics & visit", None),
+    ("tab_3", "patient",          "Patient Info",  "Patient ID & visit",   None),
     ("tab_5", "step_2",           "Step 1",        "Affected leg push",    1),
     ("tab_6", "step_3",           "Step 2",        "Hoover's sign test",   2),
     ("tab_7", "results",          "Results",       "Analysis & IVVR",      None),

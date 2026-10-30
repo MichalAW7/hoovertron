@@ -49,10 +49,9 @@ Once the device is connected, begin by entering the patient's information in the
 
 1. Navigate to the **Patient Information** tab.
 2. Fill out all relevant fields:
-   - **Name** & **Preferred Name**
-   - **Date of Birth** & **Date of Visit** (The patient's age will be calculated automatically).
-   - **Sex**, **Reason for Visit**, and **Notes**.
-   - **Examiner Name**.
+   - **Patient ID**: a study or clinic ID such as HT-0042. HooverTron does not record the patient's name, date of birth or other personal details, so don't enter them in any field.
+   - **Date of Visit** and **Examiner** (your name; it is kept when you start the next patient).
+   - **Reason for Visit** and **Notes**.
    - Select the **Dominant Leg** and the **Selected Leg** (the leg primarily being evaluated) from the dropdown menus.
 
 ## Conducting the Hoover's Sign Test

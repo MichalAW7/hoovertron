@@ -39,7 +39,7 @@ Please generate the following 12 slides with exactly this text and structure:
 
 **Slide 5: Registering Patient Information**
 * **Title:** Patient Setup
-* **Body Text:** Enter standard demographics (Name, DOB). Ensure you select the correct 'Dominant Leg' and 'Selected Leg' before proceeding to the test. Age is calculated automatically.
+* **Body Text:** Enter the Patient ID and the Examiner's name; no patient names or dates of birth are recorded. Ensure you select the correct 'Dominant Leg' and 'Selected Leg' before proceeding to the test.
 * **Layout:** Bulleted text list on the left, large Image Placeholder on the right (for the Patient tab screenshot).
 
 **Slide 6: Step 1 - Unaffected Leg Extension**
