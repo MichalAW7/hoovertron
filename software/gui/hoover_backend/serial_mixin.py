@@ -18,6 +18,7 @@ class SerialMixin:
             self.serial_port = serial.Serial(port_name, 115200, timeout=0.1)
             self.is_connected = True
             self.connection_type = 'Serial'
+            self.update_connection_indicator(True, "USB", port_name)
             self.statusbar.showMessage(f"Connected to {port_name}", 5000)
             print(f"Connected to Serial: {port_name}")
             
@@ -32,6 +33,7 @@ class SerialMixin:
             QMessageBox.critical(self, "Error", f"Failed to connect to Serial port: {str(e)}")
             self.is_connected = False
             self.connection_type = None
+            self.update_connection_indicator(False)
 
     def disconnect_serial(self):
         if hasattr(self, 'serial_timer') and self.serial_timer.isActive():
@@ -43,6 +45,7 @@ class SerialMixin:
         if self.connection_type == 'Serial':
             self.is_connected = False
             self.connection_type = None
+            self.update_connection_indicator(False)
             self.statusbar.showMessage("Disconnected", 3000)
             print("Disconnected from Serial")
 

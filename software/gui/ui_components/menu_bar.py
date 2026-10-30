@@ -24,7 +24,10 @@ class MenuBar:
         # Connection menu
         main_ui.menuConnection = QtWidgets.QMenu(main_ui.menubar)
         main_ui.menuConnection.setObjectName("menuConnection")
-        
+
+        main_ui.menuView = QtWidgets.QMenu(main_ui.menubar)
+        main_ui.menuView.setObjectName("menuView")
+
         main_ui.menuHelp = QtWidgets.QMenu(main_ui.menubar)
         main_ui.menuHelp.setObjectName("menuHelp")
         
@@ -37,12 +40,16 @@ class MenuBar:
         main_ui.actionNew = QtWidgets.QAction(MainWindow)
         main_ui.actionNew.setShortcut("Ctrl+N")
         main_ui.actionNew.setObjectName("actionNew")
-        main_ui.actionNew.triggered.connect(main_ui.file_new)
+        main_ui.actionNew.triggered.connect(main_ui.new_patient)
 
         main_ui.actionOpen = QtWidgets.QAction(MainWindow)
         main_ui.actionOpen.setShortcut("Ctrl+O")
         main_ui.actionOpen.setObjectName("actionOpen")
         main_ui.actionOpen.triggered.connect(main_ui.file_open)
+
+        main_ui.actionOpenDraft = QtWidgets.QAction(MainWindow)
+        main_ui.actionOpenDraft.setObjectName("actionOpenDraft")
+        main_ui.actionOpenDraft.triggered.connect(main_ui.file_open_draft)
 
         main_ui.actionSave = QtWidgets.QAction(MainWindow)
         main_ui.actionSave.setShortcut("Ctrl+S")
@@ -51,7 +58,7 @@ class MenuBar:
 
         main_ui.actionSave_As = QtWidgets.QAction(MainWindow)
         main_ui.actionSave_As.setObjectName("actionSave_As")
-        main_ui.actionSave_As.triggered.connect(main_ui.file_new)
+        main_ui.actionSave_As.triggered.connect(main_ui.file_save_as)
 
         main_ui.actionCreateDatabase = QtWidgets.QAction(MainWindow)
         main_ui.actionCreateDatabase.setObjectName("actionCreateDatabase")
@@ -123,6 +130,28 @@ class MenuBar:
         main_ui.actionStandard10Hz.triggered.connect(lambda: main_ui.set_filter_frequency(10))
         main_ui.actionResponsive20Hz.triggered.connect(lambda: main_ui.set_filter_frequency(20))
 
+        # --- View Actions ---
+        main_ui.actionToggleDarkMode = QtWidgets.QAction(MainWindow)
+        main_ui.actionToggleDarkMode.setObjectName("actionToggleDarkMode")
+        main_ui.actionToggleDarkMode.setCheckable(True)
+        main_ui.actionToggleDarkMode.setShortcut("Ctrl+Shift+D")
+        main_ui.actionToggleDarkMode.setChecked(getattr(main_ui, "_theme_mode", "light") == "dark")
+
+        def _on_theme_toggled(checked):
+            mode = "dark" if checked else "light"
+            main_ui.apply_theme_mode(mode)
+            settings = getattr(main_ui, "settings_data", None)
+            persist = getattr(main_ui, "save_config", None)
+            if isinstance(settings, dict) and callable(persist):
+                settings["theme_mode"] = mode
+                try:
+                    persist()
+                except Exception:
+                    pass
+
+        main_ui.actionToggleDarkMode.toggled.connect(_on_theme_toggled)
+        main_ui.menuView.addAction(main_ui.actionToggleDarkMode)
+
         # --- Help Actions ---
         main_ui.actionGetting_Started = QtWidgets.QAction(MainWindow)
         main_ui.actionGetting_Started.setObjectName("actionGetting_Started")
@@ -138,6 +167,7 @@ class MenuBar:
         # --- Assemble Menu Bar ---
         main_ui.menuFile.addAction(main_ui.actionNew)
         main_ui.menuFile.addAction(main_ui.actionOpen)
+        main_ui.menuFile.addAction(main_ui.actionOpenDraft)
         main_ui.menuFile.addAction(main_ui.actionSave)
         main_ui.menuFile.addAction(main_ui.actionSave_As)
         
@@ -153,6 +183,7 @@ class MenuBar:
         main_ui.menubar.addAction(main_ui.menuEdit.menuAction())
         main_ui.menubar.addAction(main_ui.menuDatabase.menuAction())
         main_ui.menubar.addAction(main_ui.menuConnection.menuAction())
+        main_ui.menubar.addAction(main_ui.menuView.menuAction())
         main_ui.menubar.addAction(main_ui.menuHelp.menuAction())
 
     def retranslate_ui(self, main_ui):
@@ -162,16 +193,20 @@ class MenuBar:
         main_ui.menuBaud.setTitle(_translate("MainWindow", "Baud"))
         main_ui.menuDatabase.setTitle(_translate("MainWindow", "Database"))
         main_ui.menuConnection.setTitle(_translate("MainWindow", "Connection"))
+        main_ui.menuView.setTitle(_translate("MainWindow", "View"))
+        main_ui.actionToggleDarkMode.setText(_translate("MainWindow", "Dark Mode"))
+        main_ui.actionToggleDarkMode.setShortcut(_translate("MainWindow", "Ctrl+Shift+D"))
         main_ui.menuUSB.setTitle(_translate("MainWindow", "USB Connection"))
         main_ui.menuHelp.setTitle(_translate("MainWindow", "Help"))
         
         main_ui.actionCreateDatabase.setText(_translate("MainWindow", "Create Database"))
         main_ui.actionOpenDatabase.setText(_translate("MainWindow", "Open Database"))
         main_ui.actionUpdateDatabase.setText(_translate("MainWindow", "Update Database"))
-        main_ui.actionNew.setText(_translate("MainWindow", "New"))
+        main_ui.actionNew.setText(_translate("MainWindow", "New Patient"))
         main_ui.actionNew.setShortcut(_translate("MainWindow", "Ctrl+N"))
         main_ui.actionOpen.setText(_translate("MainWindow", "Open..."))
         main_ui.actionOpen.setShortcut(_translate("MainWindow", "Ctrl+O"))
+        main_ui.actionOpenDraft.setText(_translate("MainWindow", "Open Draft..."))
         main_ui.actionSave.setText(_translate("MainWindow", "Save"))
         main_ui.actionSave.setShortcut(_translate("MainWindow", "Ctrl+S"))
         main_ui.actionSave_As.setText(_translate("MainWindow", "Save As..."))
