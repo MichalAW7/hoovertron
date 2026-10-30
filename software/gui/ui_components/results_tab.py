@@ -394,7 +394,7 @@ class ResultsTab:
             parent,
             "Clear all test data?",
             "This removes the recordings, notes and analysis for every step. "
-            "Patient demographics are kept.",
+            "The patient ID and visit details are kept.",
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
             QtWidgets.QMessageBox.Cancel,
         )

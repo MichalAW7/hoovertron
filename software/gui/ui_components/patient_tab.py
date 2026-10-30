@@ -61,7 +61,8 @@ class PatientTab:
         formCardLayout.addWidget(title)
 
         subtitle = QtWidgets.QLabel(
-            "Capture demographics and choose the affected leg before recording."
+            "Enter the patient ID and visit details, and choose the affected leg before recording. "
+            "Don't enter names, dates of birth or other personal details."
         )
         subtitle.setProperty("role", "subtitle")
         subtitle.setWordWrap(True)
@@ -85,34 +86,23 @@ class PatientTab:
             )
             unifiedForm.addRow(label, field)
 
-        # Identity
-        unifiedForm.addRow(self._section_header("Identity"))
+        # Patient: an ID only, no personal details
+        unifiedForm.addRow(self._section_header("Patient"))
 
-        main_ui.nameLabel = QLabel("Full name")
-        main_ui.nameLineEdit = QLineEdit()
-        main_ui.nameLineEdit.setPlaceholderText("e.g. Jane Smith")
-        add_row(main_ui.nameLabel, main_ui.nameLineEdit)
-
-        main_ui.preferredNameLabel = QLabel("Preferred name")
-        main_ui.preferredNameLineEdit = QLineEdit()
-        main_ui.preferredNameLineEdit.setPlaceholderText("Optional")
-        add_row(main_ui.preferredNameLabel, main_ui.preferredNameLineEdit)
-
-        main_ui.sexLabel = QLabel("Sex")
-        main_ui.sexComboBox = QComboBox()
-        main_ui.sexComboBox.addItems(["----", "Male", "Female", "Other", "Prefer not to say"])
-        add_row(main_ui.sexLabel, main_ui.sexComboBox)
+        main_ui.patientIdLabel = QLabel("Patient ID")
+        main_ui.patientIdLineEdit = QLineEdit()
+        main_ui.patientIdLineEdit.setPlaceholderText("Study or clinic ID, e.g. HT-0042")
+        main_ui.patientIdLineEdit.setMaxLength(32)
+        # Letters, digits, '.', '_' and '-' only, so the ID is also a safe file name
+        main_ui.patientIdLineEdit.setValidator(
+            QtGui.QRegularExpressionValidator(
+                QtCore.QRegularExpression(r"[A-Za-z0-9._-]*"), main_ui.patientIdLineEdit
+            )
+        )
+        add_row(main_ui.patientIdLabel, main_ui.patientIdLineEdit)
 
         # Visit
         add_section("Visit")
-
-        main_ui.dateOfBirthLabel = QLabel("Date of birth")
-        main_ui.dateOfBirthDateEdit = QDateEdit()
-        main_ui.dateOfBirthDateEdit.setCalendarPopup(True)
-        main_ui.dateOfBirthDateEdit.setDate(QtCore.QDate.currentDate().addYears(-40))
-        main_ui.dateOfBirthDateEdit.setDisplayFormat("d MMM yyyy")
-        _modernize_calendar(main_ui.dateOfBirthDateEdit)
-        add_row(main_ui.dateOfBirthLabel, main_ui.dateOfBirthDateEdit)
 
         main_ui.dateOfVisitLabel_2 = QLabel("Date of visit")
         main_ui.dateOfVisitDateEdit = QDateEdit()
@@ -122,20 +112,14 @@ class PatientTab:
         _modernize_calendar(main_ui.dateOfVisitDateEdit)
         add_row(main_ui.dateOfVisitLabel_2, main_ui.dateOfVisitDateEdit)
 
-        main_ui.ageLabel = QLabel("Age")
-        main_ui.ageLineEdit = QLineEdit()
-        main_ui.ageLineEdit.setReadOnly(True)
-        main_ui.ageLineEdit.setPlaceholderText("Computed from DOB")
-        add_row(main_ui.ageLabel, main_ui.ageLineEdit)
-
-        main_ui.reasonForVisitLabel = QLabel("Reason for visit")
-        main_ui.reasonForVisitLineEdit = QLineEdit()
-        add_row(main_ui.reasonForVisitLabel, main_ui.reasonForVisitLineEdit)
-
         main_ui.examinerLabel = QLabel("Examiner")
         main_ui.examinerLineEdit = QLineEdit()
         main_ui.examinerLineEdit.setPlaceholderText("Clinician name")
         add_row(main_ui.examinerLabel, main_ui.examinerLineEdit)
+
+        main_ui.reasonForVisitLabel = QLabel("Reason for visit")
+        main_ui.reasonForVisitLineEdit = QLineEdit()
+        add_row(main_ui.reasonForVisitLabel, main_ui.reasonForVisitLineEdit)
 
         main_ui.notesLabel = QLabel("Notes")
         main_ui.notesLineEdit = QLineEdit()
@@ -157,25 +141,6 @@ class PatientTab:
 
         formCardLayout.addStretch(1)
 
-        # ---- Behaviour: auto-compute age from DOB --------------------
-        def update_age():
-            dob = main_ui.dateOfBirthDateEdit.date()
-            visit = main_ui.dateOfVisitDateEdit.date()
-            if dob.isValid() and visit.isValid():
-                age = visit.year() - dob.year() - (
-                    (visit.month(), visit.day()) < (dob.month(), dob.day())
-                )
-                if age < 0 or age > 130:
-                    main_ui.ageLineEdit.clear()
-                else:
-                    main_ui.ageLineEdit.setText(str(age))
-            else:
-                main_ui.ageLineEdit.clear()
-
-        main_ui.dateOfBirthDateEdit.dateChanged.connect(update_age)
-        main_ui.dateOfVisitDateEdit.dateChanged.connect(update_age)
-        update_age()
-
     # ------------------------------------------------------------------
     def _new_form(self):
         form = QtWidgets.QFormLayout()
@@ -195,11 +160,7 @@ class PatientTab:
 
     def retranslate_ui(self, main_ui):
         _translate = QtCore.QCoreApplication.translate
-        main_ui.nameLabel.setText(_translate("MainWindow", "Full name"))
-        main_ui.preferredNameLabel.setText(_translate("MainWindow", "Preferred name"))
-        main_ui.dateOfBirthLabel.setText(_translate("MainWindow", "Date of birth"))
-        main_ui.ageLabel.setText(_translate("MainWindow", "Age"))
-        main_ui.sexLabel.setText(_translate("MainWindow", "Sex"))
+        main_ui.patientIdLabel.setText(_translate("MainWindow", "Patient ID"))
         main_ui.dateOfVisitLabel_2.setText(_translate("MainWindow", "Date of visit"))
         main_ui.reasonForVisitLabel.setText(_translate("MainWindow", "Reason for visit"))
         main_ui.notesLabel.setText(_translate("MainWindow", "Notes"))

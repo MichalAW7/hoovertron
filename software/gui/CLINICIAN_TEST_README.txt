@@ -11,6 +11,8 @@ Saving patient files
 --------------------
 The app saves patient CSV files automatically into the HooverTron Patients folder beside HooverTron.exe.
 
+Enter a Patient ID (a study or clinic ID such as HT-0042), not the patient's name or date of birth. Files are named by Patient ID and visit date, e.g. HT-0042_2026-10-30-Visit.csv. Autosave starts once a Patient ID is entered.
+
 Use Save to update the current patient CSV. Use Save As only if you want to export a copy somewhere else.
 
 New patient workflow

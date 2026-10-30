@@ -11,6 +11,22 @@ from config import get_patient_exports_dir
 
 
 class FileMixin:
+    DATABASE_HEADER = [
+        "Test Number",
+        "System Date and Time",
+        "Patient ID",
+        "Examiner Name",
+        "Date of Visit",
+        "Reason For Visit",
+        "Notes",
+        "Dominant Leg",
+        "Selected Leg",
+        "Unaffected leg extension",
+        "Affected leg voluntary extension (V)",
+        "Affected leg involuntary extension (IV)",
+        "Affected leg involuntary/voluntary ratio (IVVR = IV/V)",
+    ]
+
     def show_message(self, title, message, icon=QMessageBox.Information):
         msg = QMessageBox()
         msg.setIcon(icon)
@@ -30,10 +46,9 @@ class FileMixin:
 
     def _auto_export_base_path(self, snapshot):
         patient = snapshot.get("patient", {})
-        patient_name = self._sanitize_filename_part(patient.get("name", ""), "Unnamed_Patient")
-        date_of_birth = self._sanitize_filename_part(patient.get("date_of_birth", ""), "Unknown-DOB")
+        patient_id = self._sanitize_filename_part(patient.get("patient_id", ""), "No-Patient-ID")
         date_of_visit = self._sanitize_filename_part(patient.get("date_of_visit", ""), "Unknown-Visit")
-        filename = f"{patient_name}_{date_of_birth}-DOB_{date_of_visit}-Visit.csv"
+        filename = f"{patient_id}_{date_of_visit}-Visit.csv"
         return os.path.join(get_patient_exports_dir(), filename)
 
     def _csv_path_matches_current_draft(self, path):
@@ -92,15 +107,11 @@ class FileMixin:
         return [
             [
                 "Patient Information:",
-                patient.get("name", ""),
-                patient.get("preferred_name", ""),
-                patient.get("date_of_birth", ""),
+                patient.get("patient_id", ""),
+                patient.get("examiner", ""),
                 patient.get("date_of_visit", ""),
-                patient.get("age", ""),
-                patient.get("sex", ""),
                 patient.get("reason_for_visit", ""),
                 patient.get("notes", ""),
-                patient.get("examiner", ""),
                 patient.get("dominant_leg", ""),
                 patient.get("selected_leg", ""),
             ],
@@ -148,27 +159,23 @@ class FileMixin:
     def _build_legacy_snapshot(self, rows, source_path):
         today = QtCore.QDate.currentDate().toString(QtCore.Qt.ISODate)
         snapshot = {
-            "version": self.SNAPSHOT_VERSION,
+            "version": 1,  # an old file, so the personal details in it are not loaded
             "draft": {
                 "id": "",
                 "created_at": self._utcnow_iso(),
                 "updated_at": self._utcnow_iso(),
-                "patient_name": "",
+                "patient_id": "",
                 "export_path": source_path,
                 "completion_status": "legacy import",
                 "is_active": True,
             },
             "ui": {"main_tab_index": 0, "test_tab_index": 0},
             "patient": {
-                "name": "",
-                "preferred_name": "",
-                "date_of_birth": today,
+                "patient_id": "",
+                "examiner": "",
                 "date_of_visit": today,
-                "age": "",
-                "sex": "----",
                 "reason_for_visit": "",
                 "notes": "",
-                "examiner": "",
                 "dominant_leg": "----",
                 "selected_leg": "----",
             },
@@ -221,20 +228,17 @@ class FileMixin:
 
             label = row[0].strip()
             if label == "Patient Information:":
+                # Old layout: name, preferred name, date of birth, date of visit, age, sex,
+                # reason, notes, examiner, dominant leg, selected leg. The personal ones are skipped.
                 snapshot["patient"] = {
-                    "name": row[1] if len(row) > 1 else "",
-                    "preferred_name": row[2] if len(row) > 2 else "",
-                    "date_of_birth": row[3] if len(row) > 3 else today,
+                    "patient_id": "",
+                    "examiner": row[9] if len(row) > 9 else "",
                     "date_of_visit": row[4] if len(row) > 4 else today,
-                    "age": row[5] if len(row) > 5 else "",
-                    "sex": row[6] if len(row) > 6 else "----",
                     "reason_for_visit": row[7] if len(row) > 7 else "",
                     "notes": row[8] if len(row) > 8 else "",
-                    "examiner": row[9] if len(row) > 9 else "",
                     "dominant_leg": row[10] if len(row) > 10 else "----",
                     "selected_leg": row[11] if len(row) > 11 else "----",
                 }
-                snapshot["draft"]["patient_name"] = snapshot["patient"]["name"]
             elif label == "HS step 1 extension force:":
                 force_values = self._float_list_from_row(row)
                 snapshot["steps"]["step_1"]["force"] = force_values
@@ -337,7 +341,8 @@ class FileMixin:
         self.mark_draft_inactive()
         self.start_new_draft(reset_state=False)
         self.apply_snapshot(snapshot)
-        self.patientDataFile = path
+        if not self._is_legacy_snapshot(snapshot):
+            self.patientDataFile = path
         self.force_autosave("open-patient")
 
     def file_open_draft(self):
@@ -376,6 +381,40 @@ class FileMixin:
         if hasattr(self, "statusbar"):
             self.statusbar.showMessage("Ready for a new patient", 3000)
 
+    def _database_row(self):
+        return [
+            self.testNumber,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            self.patientIdLineEdit.text().strip(),
+            self.examinerLineEdit.text(),
+            self.dateOfVisitDateEdit.date().toString(),
+            self.reasonForVisitLineEdit.text(),
+            self.notesLineEdit.text(),
+            self.dominantLegComboBox.currentText(),
+            self.selectedLegComboBox.currentText(),
+            self.extensionForceLineEdit.text(),
+            self.unaffectedLegPeakStrengthLineEdit_2.text(),
+            self.affectedLegPeakStrengthLineEdit_3.text(),
+            self.involuntaryVoluntaryRatioAffectedLegLineEdit.text(),
+        ]
+
+    def _database_has_other_columns(self, path):
+        """True when an existing database's header differs, e.g. an older one with names and dates of birth."""
+        try:
+            with open(path, "r", encoding="utf-8", newline="") as database_file:
+                header = next(csv.reader(database_file), [])
+        except OSError:
+            return False
+        return bool(header) and header != self.DATABASE_HEADER
+
+    def _warn_database_columns(self, title):
+        QMessageBox.warning(
+            self,
+            title,
+            "This database has different columns, probably from an older version that stored "
+            "patient names and dates of birth. Create a new database to save results with patient IDs.",
+        )
+
     def file_new_database(self):
         name, _ = QFileDialog.getSaveFileName(
             self,
@@ -388,48 +427,8 @@ class FileMixin:
             self.testNumber = 1
             with open(self.dataBaseFile, "w", encoding="utf-8", newline="") as database_file:
                 writer = csv.writer(database_file)
-                writer.writerow(
-                    [
-                        "Test Number",
-                        "System Date and Time",
-                        "Patient Name",
-                        "Preferred Name",
-                        "Date of Birth",
-                        "Date of Visit",
-                        "Age",
-                        "Sex",
-                        "Reason For Visit",
-                        "Notes",
-                        "Examiner Name",
-                        "Dominant Leg",
-                        "Selected Leg",
-                        "Unaffected leg extension",
-                        "Affected leg voluntary extension (V)",
-                        "Affected leg involuntary extension (IV)",
-                        "Affected leg involuntary/voluntary ratio (IVVR = IV/V)",
-                    ]
-                )
-                writer.writerow(
-                    [
-                        self.testNumber,
-                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        self.nameLineEdit.text(),
-                        self.preferredNameLineEdit.text(),
-                        self.dateOfBirthDateEdit.date().toString(),
-                        self.dateOfVisitDateEdit.date().toString(),
-                        self.ageLineEdit.text(),
-                        self.sexComboBox.currentText(),
-                        self.reasonForVisitLineEdit.text(),
-                        self.notesLineEdit.text(),
-                        self.examinerLineEdit.text(),
-                        self.dominantLegComboBox.currentText(),
-                        self.selectedLegComboBox.currentText(),
-                        self.extensionForceLineEdit.text(),
-                        self.unaffectedLegPeakStrengthLineEdit_2.text(),
-                        self.affectedLegPeakStrengthLineEdit_3.text(),
-                        self.involuntaryVoluntaryRatioAffectedLegLineEdit.text(),
-                    ]
-                )
+                writer.writerow(self.DATABASE_HEADER)
+                writer.writerow(self._database_row())
 
             self.isNewDatabase = False
             self.save_config()
@@ -442,6 +441,9 @@ class FileMixin:
             directory=self._default_export_directory(),
             filter="CSV Files (*.csv)",
         )
+        if name and self._database_has_other_columns(name):
+            self._warn_database_columns("Open Database")
+            return
         self.dataBaseFile = name
         if self.dataBaseFile:
             self.load_last_test_number()
@@ -452,33 +454,16 @@ class FileMixin:
         if not self.dataBaseFile:
             QMessageBox.warning(self, "Update Database", "Open or create a database before saving.")
             return
+        if self._database_has_other_columns(self.dataBaseFile):
+            self._warn_database_columns("Update Database")
+            return
 
         self.fill_values()
         try:
             with open(self.dataBaseFile, "a", encoding="utf-8", newline="") as database_file:
                 writer = csv.writer(database_file)
                 self.testNumber += 1
-                writer.writerow(
-                    [
-                        self.testNumber,
-                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        self.nameLineEdit.text(),
-                        self.preferredNameLineEdit.text(),
-                        self.dateOfBirthDateEdit.date().toString(),
-                        self.dateOfVisitDateEdit.date().toString(),
-                        self.ageLineEdit.text(),
-                        self.sexComboBox.currentText(),
-                        self.reasonForVisitLineEdit.text(),
-                        self.notesLineEdit.text(),
-                        self.examinerLineEdit.text(),
-                        self.dominantLegComboBox.currentText(),
-                        self.selectedLegComboBox.currentText(),
-                        self.extensionForceLineEdit.text(),
-                        self.unaffectedLegPeakStrengthLineEdit_2.text(),
-                        self.affectedLegPeakStrengthLineEdit_3.text(),
-                        self.involuntaryVoluntaryRatioAffectedLegLineEdit.text(),
-                    ]
-                )
+                writer.writerow(self._database_row())
 
             self.show_message("Data Saved", "Data saved successfully in the database.")
         except PermissionError:

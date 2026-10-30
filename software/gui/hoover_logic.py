@@ -37,9 +37,7 @@ class HooverTronWindow(
 
     def _connect_change_tracking(self):
         line_edits = [
-            self.nameLineEdit,
-            self.preferredNameLineEdit,
-            self.ageLineEdit,
+            self.patientIdLineEdit,
             self.reasonForVisitLineEdit,
             self.notesLineEdit,
             self.examinerLineEdit,
@@ -47,11 +45,10 @@ class HooverTronWindow(
         for line_edit in line_edits:
             line_edit.textChanged.connect(lambda *_: self.schedule_autosave("patient-field"))
 
-        for combo_box in (self.sexComboBox, self.dominantLegComboBox, self.selectedLegComboBox):
+        for combo_box in (self.dominantLegComboBox, self.selectedLegComboBox):
             combo_box.currentIndexChanged.connect(lambda *_: self.schedule_autosave("patient-field"))
 
-        for date_edit in (self.dateOfBirthDateEdit, self.dateOfVisitDateEdit):
-            date_edit.dateChanged.connect(lambda *_: self.schedule_autosave("patient-field"))
+        self.dateOfVisitDateEdit.dateChanged.connect(lambda *_: self.schedule_autosave("patient-field"))
 
         for text_edit in (self.textEdit, self.textEdit_2, self.textEdit_6, self.textEdit_7):
             text_edit.textChanged.connect(lambda: self.schedule_autosave("notes-updated"))
